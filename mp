@@ -143,6 +143,7 @@ runcmd:
   - chown -R ubuntu:ubuntu /home/ubuntu
   
   - su - ubuntu -c 'curl -fsSL https://opencode.ai/install | bash'
+  - ln -s /home/ubuntu/.opencode/bin/opencode /usr/local/bin/opencode
 EOF
 
     if ! multipass launch --name "$VM_NAME" --cpus 4 --memory 8G --disk 15G --cloud-init "$CLOUD_INIT"; then
