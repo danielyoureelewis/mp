@@ -26,7 +26,7 @@ sudo chmod +x /usr/local/bin/mp
 **Step B: Export API Credentials**
 The script injects your AI proxy credentials into the VM at runtime. Add these to your Mac's `~/.zshrc` (configured for your local LiteLLM proxy):
 ```bash
-export OPENAI_API_BASE="[http://10.1.1.163:4000/v1](http://10.1.1.163:4000/v1)"
+export OPENAI_API_BASE="[http://127.0.0.1:4000/v1](http://127.0.0.1:4000/v1)"
 export OPENAI_API_KEY="sk-local-ai-key"
 ```
 Reload your profile: `source ~/.zshrc`
