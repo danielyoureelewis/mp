@@ -1,13 +1,20 @@
 # OpenCode RE Harness
 
-An ephemeral environment for automated reverse engineering. This architecture strictly separates an LLM agent (running on an Ubuntu host VM) from security tools (running inside a Kali Linux Docker container). 
+An ephemeral environment for automated reverse engineering. This architecture separates an LLM agent (running on an Ubuntu host VM) from security tools (running inside a Kali Linux Docker container). 
 
 ## 1. Architecture & Boundaries
 * **`~/workspace/`**: The shared analysis boundary. Files placed in this directory on the Ubuntu VM are instantly accessible to the isolated Kali container.
 * **`justfile`**: The execution bridge. All commands routed through this file execute out-of-band inside Kali.
 * **`ledger.jsonl`**: The telemetry log. Records the timestamp, tool, command, and execution duration for every bridged action.
 
-## 2. Installation & Configuration (Mac Host)
+## 2. Prerequisites (Mac Host)
+
+The harness relies on Canonical's Multipass engine to orchestrate the Ubuntu host VMs. Install it via Homebrew before deploying:
+```bash
+brew install --cask multipass
+```
+
+## 3. Installation & Configuration (Mac Host)
 
 **Step A: Install the Multipass Wrapper**
 Create the `mp` executable in your local binaries path to handle provisioning and data extraction:
@@ -24,10 +31,10 @@ export OPENAI_API_KEY="sk-local-ai-key"
 ```
 Reload your profile: `source ~/.zshrc`
 
-## 3. Deployment & Verification
+## 4. Deployment & Verification
 
 **Deploy a Harness:**
-Run the wrapper from your terminal. The script will provision the VM, inject your credentials, build the workspace, and automatically spin up the Kali detonation zone in the background.
+Run the wrapper from your Mac terminal. The script will provision the VM, inject your credentials, build the workspace, and automatically spin up the Kali detonation zone in the background.
 ```bash
 mp create hax
 ```
@@ -41,7 +48,7 @@ just lab-status
 ```
 *Verification:* The output displays the active `kali-workspace` Docker container. Run `just kali ls` to verify the container can read the shared workspace.
 
-## 4. Manual Operation
+## 5. Manual Operation
 
 **NEVER** attach a shell directly to the Kali container (`docker exec -it kali /bin/bash`). Interactive shells evade telemetry and desynchronize the agent's state. 
 
@@ -53,7 +60,7 @@ just kali r2 -A target.bin
 ```
 *Verification:* Check `ledger.jsonl` after execution; you should see your exact commands and their execution durations recorded as JSON objects.
 
-## 5. Agent Operation (OpenCode)
+## 6. Agent Operation (OpenCode)
 
 Because Node.js CLIs can fail on long, multi-line string arguments, always use the **Task File Pattern** to instruct OpenCode.
 
@@ -72,7 +79,7 @@ cd ~/workspace
 opencode "Follow the exact instructions in task.txt"
 ```
 
-## 6. Extracting Evidence
+## 7. Extracting Evidence
 
 Because this environment is stateless, you must pull your research artifacts out before destroying the VM (`mp destroy hax`). Use the wrapper script to securely extract files without setting up persistent mounts.
 
@@ -82,4 +89,4 @@ Run this from your **Mac terminal**:
 mp cp hax /home/ubuntu/workspace/research/threads/thr-001/evidence/E-001.md ./
 mp cp hax /home/ubuntu/workspace/ledger.jsonl ./
 ```
-*Verification:* The files will appear in your Mac's current working directory, untouched by any container escape risks.
+*Verification:* The files will appear in your Mac's current working directory.
